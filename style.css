@@ -1,3 +1,98 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    min-width: 320px;
+    min-height: 600px; 
+}
+
 body {
-    background-color: rgb(180, 242, 247);
+    background-color: rgb(113, 151, 173);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+p {
+    font-size: 1.5rem;
+}
+
+.names {
+    width: 100%;
+    background-color: red;
+}
+
+.grid {
+    border-radius: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-areas: repeat(3, 1fr);
+    gap: 10px;
+    width: 90vmin;
+    max-width: 300px;
+    aspect-ratio: 1;
+}
+
+.cell {
+    background-color: rgb(255, 255, 255);
+    border: 1px solid black;
+    border-radius: 20px;
+    aspect-ratio: 1 / 1;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    line-height: 1; 
+    user-select: none;
+    cursor: pointer;
+
+}
+
+.cell:hover {
+    background-color: rgb(79, 156, 167);
+    transition: background-color 0.2s ease;
+    box-shadow: 3px 3px rgb(46, 46, 46) ;
+}
+
+.reset {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    background-color: #ffffff;
+    color: #333;
+    border: 2px solid #333;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.reset:hover {
+    background-color: #4f9ca7;
+    color: #fff;
+    box-shadow: 2px 2px rgb(46, 46, 46) ;
+
+}
+
+footer {
+    padding: 10px;
+    text-align: center;
+    padding: 10px;
+    font-size: 0.9rem;
+    flex-shrink: 0;
 }
