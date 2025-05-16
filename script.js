@@ -86,6 +86,9 @@ const GameController = (() => {
         if (!playerOne || !playerTwo) {
             alert('Introduce both players names!');
             return;
+        } else if (playerOne.toLowerCase() === playerTwo.toLowerCase()) {
+            alert('Players cannot have the same name!');
+            return;
         }
         else {
             setPlayerNames(playerOne, playerTwo);
