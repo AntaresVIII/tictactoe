@@ -1,10 +1,12 @@
-// Factory function for creating players
+const main = document.querySelector("main");
+
+// PLAYER CREATOR //
 
 function Player(name, marker) {
     return { name, marker };
 };
 
-// GameBoard module
+// GAMEBOARD MODULE //
 
 const GameBoard = (() => {
     let board = ["", "", "", "", "", "", "", "", ""];
@@ -26,17 +28,78 @@ const GameBoard = (() => {
     return { getBoard, setCell, resetBoard };
 })();
 
-// Game controller
+// GAME CONTROLLER //
 
 const GameController = (() => {
-    const player1 = Player("Player 1", "X");
-    const player2 = Player("Player 2", "O");
+    let player1 = Player("Player 1", "X");
+    let player2 = Player("Player 2", "O");
     let currentPlayer = player1;
     let gameOver = false;
+    let gameStarted = false;
+
+    function setPlayerNames(name1, name2) {
+        player1.name = name1;
+        player2.name = name2;
+    ;}
+
+    const playerNameForm = document.createElement("div");
+    playerNameForm.classList.add("nameForm");
+
+    const playerOneInput = document.createElement("input");
+    playerOneInput.id = "playerOneInput";
+    playerOneInput.classList.add("playerNames");
+    playerOneInput.setAttribute("type", "text");
+    playerOneInput.placeholder = "Player 1"; 
+
+    const playerTwoInput = document.createElement("input");
+    playerTwoInput.id = "playerTwoInput";
+    playerTwoInput.classList.add("playerNames");
+    playerTwoInput.setAttribute("type", "text");
+    playerTwoInput.placeholder = player2.name; 
+
+    const startGameButton = document.createElement("button");
+    startGameButton.id = "startGameBtn";
+    startGameButton.textContent = "Start Game";
+
+    main.appendChild(playerNameForm);
+    playerNameForm.appendChild(playerOneInput);
+    playerNameForm.appendChild(playerTwoInput);
+    playerNameForm.appendChild(startGameButton);
+
+    const result = document.createElement("div");
+    result.id = "result";
+    result.style.display = "none";
+
+    main.appendChild(result);
+
+    const currentTurn = document.createElement("div");
+    currentTurn.id = "turn";
+    currentTurn.style.display = "none";
+
+    main.appendChild(currentTurn);
+
+
+    startGameButton.addEventListener("click", () => {
+        const playerOne = playerOneInput.value.trim();
+        const playerTwo = playerTwoInput.value.trim();
+
+        if (!playerOne || !playerTwo) {
+            alert('Introduce both players names!');
+            return;
+        }
+        else {
+            setPlayerNames(playerOne, playerTwo);
+            gameStarted = true;
+            playerNameForm.style.display = 'none';
+            result.style.display = 'none';
+            currentTurn.textContent = `${playerOne}'s turn`;
+            currentTurn.style.display = "block";
+        }
+    });
 
     const switchPlayer = () => {
         currentPlayer = currentPlayer === player1 ? player2 : player1;
-        console.log(`Current player switched to: ${currentPlayer.name}`);
+        currentTurn.textContent = `${currentPlayer.name}'s turn`;
     };
 
     const checkWinner = () => {
@@ -44,7 +107,7 @@ const GameController = (() => {
         const winCombos = [
             [0, 1, 2], [3, 4, 5], [6, 7, 8], // rows
             [0, 3, 6], [1, 4, 7], [2, 5, 8], // cols
-            [0, 4, 8], [2, 4, 6]          // diags
+            [0, 4, 8], [2, 4, 6]             // diagonals
         ];
 
         return winCombos.some(combo =>
@@ -56,44 +119,53 @@ const GameController = (() => {
         GameBoard.resetBoard();
         currentPlayer = player1;
         gameOver = false;
-        console.log("Game restarted.");
+        gameStarted = false;
+
+        playerNameForm.style.display = 'block';
+        setPlayerNames("Player 1", "Player 2");
+
     };
 
     function playTurn(index) {
-        if (GameBoard.setCell(index, currentPlayer.marker)) {
-            console.log(`${currentPlayer.name} played at index ${index}`);
+        if (!gameStarted) {
+            alert('First introduce both player names and then click Start Game!');
+            return false;
+        }
+        if (gameOver) return false;
 
-        if (checkWginner()) {
-            console.log(`${currentPlayer.name} wins!`);
-            gameOver = true;
-            return;
-        } else if (GameBoard.getBoard().every(cell => cell !== "")) {
-            console.log("It's a draw!");
-            gameOver = true;
-            return;
+        if (GameBoard.setCell(index, currentPlayer.marker)) {
+
+            if (checkWinner()) {
+                gameOver = true;
+                result.textContent = `${currentPlayer.name} wins!`;
+                result.style.display = "block";
+                currentTurn.style.display = "none";
+                return true;
+            } else if (GameBoard.getBoard().every(cell => cell !== "")) {
+                gameOver = true;
+                result.textContent = "It's a draw!";
+                result.style.display = "block";
+                currentTurn.style.display = "none";
+                return true;
+            }
+            switchPlayer();
+            return true;
         }
-        switchPlayer();
-        }
+        return false;
     };
 
-    return { getCurrentPlayer: () => currentPlayer, playTurn, restart, getBoard: GameBoard.getBoard, isGameOver: () => gameOver };
+    return { getCurrentPlayer: () => currentPlayer, setPlayerNames, playTurn, restart, getBoard: GameBoard.getBoard, playerNameForm: playerNameForm, result: result, currentTurn: currentTurn };
 })();
 
-// DOM controller to display Board and add interactivity
+// DOM CONTROLLER TO DISPLAY BOARD AND ADD INTERACTIVITY //
+
 const DisplayController = (() => {
-
-    const main = document.querySelector("main");
-
-/*     const playerNames = document.createElement("div");
-    playerNames.id = "playerNames";
-    playerNames.classList.add("names");
-    playerNames.textContent = "testestestestest"; */
 
     const boardGrid = document.createElement("div");
     boardGrid.id = "gameGrid"
     boardGrid.classList.add("grid");
 
-    // Create each of the 9 cells in the 3x3 grid
+    // Create each of the 9 cells in the 3x3 grid //
     for (let i = 0; i < 9; i++) {
         const cell = document.createElement("div");
         cell.id = i;
@@ -106,37 +178,41 @@ const DisplayController = (() => {
     resetButton.classList.add("reset");
     resetButton.textContent = "Reset game";
 
-/*     main.appendChild(playerNames); */
     main.appendChild(boardGrid);
     main.appendChild(resetButton);
 
 
     resetButton.addEventListener("click", () => {
         GameController.restart();
+        GameController.setPlayerNames("Player 1", "Player 2");
         document.querySelectorAll(".cell").forEach(cell => {
         cell.textContent = "";
         cell.classList.remove("played");
         });
+        GameController.playerNameForm.style.display = "grid";
+        GameController.result.textContent = "";
+        GameController.result.style.display = "none";
+        GameController.currentTurn.style.display = "none";
+        GameController.currentTurn.textContent = "";
+
     });
 
-
+    return { main };
 
 })();
 
-// Handle turns with clicking
+// HANDLE TURNS WHEN CLICKING //
 
 (function cellPlay() {
 
     function handleClick(child) {
-        if (GameController.isGameOver()) {
-            return;
-        }
-        else if (child.classList.contains("played")) {
-            console.log("Cell already taken!");
-            return;
-        }
+
+        if (child.classList.contains("played")) { return; }
 
         const current = GameController.getCurrentPlayer();
+        const played = GameController.playTurn(child.id);
+
+        if (!played) return;
 
         GameController.playTurn(child.id);
 
@@ -152,6 +228,3 @@ const DisplayController = (() => {
     });
 
 })();
-
-
-// TO DO: Clean up the interface to allow players to put in their names and add a display element that shows the results upon game end! //
