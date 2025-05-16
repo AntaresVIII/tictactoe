@@ -2,6 +2,10 @@
 
 This is a simple **Tic-Tac-Toe** game built with **JavaScript**, **HTML**, and **CSS**. It's a learning project that is part of the **JavaScript curriculum** in [The Odin Project](https://www.theodinproject.com/).
 
+## Live preview
+
+You can test it by clicking [here](https://antaresviii.github.io/tictactoe/).
+
 ## Purpose
 
 The main goal of this project is to practice fundamental JavaScript concepts, including:
